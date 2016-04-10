@@ -1,0 +1,76 @@
+<html>
+	<head lang="en">
+		<title>Energy Forecasting by Radu Lupescu</title>
+
+		<link rel="stylesheet" href="resources/css/angular-chart.css"/>
+		<link rel="stylesheet" href="resources/css/bootstrap.css"/>
+		<link rel="stylesheet" href="resources/css/select.css"/>
+		<link rel="stylesheet" href="resources/css/rzslider.css"/>
+		<link rel="stylesheet" href="css/style.css"/>
+
+		<script type="text/javascript" src="resources/scripts/angular.js"></script>
+		<script type="text/javascript" src="resources/scripts/chart.js"></script>
+		<script type="text/javascript" src="resources/scripts/angular-chart.js"></script>
+		<script type="text/javascript" src="resources/scripts/angular-sanitize.js"></script>
+		<script type="text/javascript" src="resources/scripts/angular-animate.js"></script>
+		<script type="text/javascript" src="resources/scripts/angular-ui-bootstrap.js"></script>
+		<script type="text/javascript" src="resources/scripts/select.js"></script>
+		<script type="text/javascript" src="resources/scripts/rzslider.js"></script>
+
+		<script type="text/javascript" src="scripts/app.js"></script>
+		<script type="text/javascript" src="scripts/utils.service.js"></script>
+		<script type="text/javascript" src="scripts/gradientDescentLinearModel.service.js"></script>
+		<script type="text/javascript" src="scripts/script.js"></script>
+	</head>
+
+	<body ng-app="energyForecast">
+		<div ng-controller="GradientDescentCtrl as gdCtrl"
+			style="margin: auto; width: 1100px; margin-top: 50px">
+
+			<div class="row">
+				<div class="col-sm-12">
+					<ui-select theme="bootstrap" ng-model="gdCtrl.countrySelection">
+						<ui-select-match placeholder="Select region">{{$select.selected}}</ui-select-match>
+						<ui-select-choices repeat="item in countries | filter: $select.search" position="down">
+							<div ng-bind-html="item | highlight: $select.search"></div>
+						</ui-select-choices>
+					</ui-select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-12">
+					<label>Select years range</label>
+					<rzslider rz-slider-model="fromIndex" rz-slider-high="toIndex"
+						rz-slider-options="{floor: 1990, ceil: 2014, minRange: 1}">
+					</rzslider>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-3">
+					<button class="btn btn-primary" ng-click="showData()" ng-disabled="!gdCtrl.countrySelection">Show data</button>
+				</div>
+			</div>
+
+
+			<div ng-show="haveData">
+				<div class="row">
+					<div class="col-sm-12">
+						<canvas id="line" class="chart chart-line" 
+								chart-data="chartData" chart-labels="chartLabels" 
+								chart-legend="true" chart-series="series"
+								width="1000" height="500">
+						</canvas>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-3">
+						<button class="btn btn-primary" ng-click="process()">Process</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

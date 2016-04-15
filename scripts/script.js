@@ -10,6 +10,23 @@
 
 		$scope.countries = ["World", "OECD", "G7", "BRICS", "Europe", "European Union", "Belgium", "Czech Rep.", "France", "Germany", "Italy", "Netherlands", "Poland", "Portugal", "Romania", "Spain", "Sweden", "United Kingdom", "Norway", "Turkey", "CIS", "Kazakhstan", "Russia", "Ukraine", "Uzbekistan", "America", "North America", "Canada", "United States", "Latin America", "Argentina", "Brazil", "Chile", "Colombia", "Mexico", "Venezuela", "Asia", "China", "India", "Indonesia", "Japan", "Malaysia", "South Korea", "Taiwan", "Thailand", "Pacific", "Australia", "New Zealand", "Africa", "Algeria", "Egypt", "Nigeria", "South Africa", "Middle-East", "Iran", "Kuwait", "Saudi Arabia", "United Arab Emirates"];
 
+		$scope.energyTypes = [{
+			"value": "electricity",
+			"displayName": "Electricity"
+		},{
+			"value": "coal_lignite",
+			"displayName": "Coal and Lignite"
+		},{
+			"value": "crude_oil",
+			"displayName": "Crude oil"
+		},{
+			"value": "oil_products",
+			"displayName": "Oil Products"
+		},{
+			"value": "natural_gas",
+			"displayName": "Natural gas"
+		}];
+
 		$scope.fromIndex = 1995;
 		$scope.toIndex = 2005;
 		$scope.chartData = [];
@@ -32,7 +49,7 @@
 
 			var slicedDataForYears = parsedEnergyDataForSelection.slice($scope.fromIndex - 1990, $scope.toIndex - 1990 + 1);
 
-			var yearIndex = 1990;
+			var yearIndex = $scope.fromIndex;
 			
 			var dataReadyForGradientDescent = slicedDataForYears.map(function(element) {
 				return {
@@ -72,11 +89,11 @@
 		};
 
 		$scope.showData = function () {
-			$scope.chartLabels = utilsService.getLabelsForChart();
+			$scope.chartLabels = utilsService.getLabelsForChart($scope.fromIndex - 1990);
 
 			$q.all([
-				$http.get("./csv/electricity_production.csv"),
-				$http.get("./csv/electricity_consumption.csv")
+				$http.get("./csv/" + viewModel.energyType.value + "_production.csv"),
+				$http.get("./csv/" + viewModel.energyType.value + "_consumption.csv")
 			]).then(function(response) {
 				$scope.prodData = $scope.parseData(response[0].data);
 
@@ -87,5 +104,37 @@
 			$scope.series = ['Production', 'Consumption'];
 			$scope.haveData = true;
 		};
+
+		$scope.polynomialOptions = [
+			{
+				"name": "x",
+				"value": "x",
+				"power": 1,
+				"selected": false
+			},
+			{
+				"name": "xSquare",
+				"value": "x",
+				"power": 2,
+				"selected": false
+			},
+			{
+				"name": "xCube",
+				"value": "x",
+				"power": 3,
+				"selected": false
+			},
+			{
+				"name": "xToTheFourth",
+				"value": "x",
+				"power": 4,
+				"selected": false
+			},
+			{
+				"name": "sinusOfX",
+				"value": "sin(x)",
+				"selected": false
+			},
+		];
 	};
 })();

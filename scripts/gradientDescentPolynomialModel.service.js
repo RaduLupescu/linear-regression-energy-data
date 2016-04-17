@@ -22,9 +22,19 @@
 			return totalError/points.length;
 		};
 
-		function stepGradient (weights, points, learningRate) {
-			var w0_gradient = 0,
-				w1_gradient = 0,
+		function getError (polynomial, x, y) {
+			var forecasted_y = 0;
+
+			angular.forEach(polynomial, function (item) {
+				forecasted_y += item.weight * Math.pow(x, item.power);
+			});
+
+			return y - forecasted_y;
+		};
+
+		function stepGradient (selection, points, learningRate) {
+			var gradients = [0, 0, 0, 0, 0],
+				error,
 				x, y,
 				N = points.length;
 
@@ -32,48 +42,39 @@
 				x = points[i].year - 1990;
 				y = points[i].value;
 
-				for (var j = 0; j < weights.length; j++) {
-					gradients[i] += -(2/N) * (y - ((weights[1] * x) + weights[0]));
-				}
+				// Calculate each gradient
+				for (var j = 0; j < selection.length; j++) {
+					error = getError(selection, x, y);
 
-				w0_gradient += -(2/N) * (y - ((w1 * x) + w0));
-				w1_gradient += -(2/N) * x * (y - ((w1 * x) + w0));
+					gradients[j] += -(1/N) * error * Math.pow(x, selection[j].power);
+				}
 			}
 
-			var new_w0 = w0 - (learningRate * w0_gradient);
-			var new_w1 = w1 - (learningRate * w1_gradient);
-
-			return [new_w0, new_w1];
+			for (var i = 0; i < selection.length; i++) {
+				selection[i].weight = selection[i].weight - (learningRate * gradients[i]);
+			}
 		};
 
-		function runGradientDescent (w0, w1, points, learningRate, iterationsLimit) {
-			var i = 0,
-				weights = [w0, w1],
-				oldWeights = [-1, -1];
+		function runGradientDescent (selection, points, learningRate, iterationsLimit) {
+			var i = 0;
 
 			console.log("Running gradient descent");
 			while (i < iterationsLimit) {
-				weights = stepGradient(weights[0], weights[1], points, learningRate);
+				stepGradient(selection, points, learningRate);
 				i++;
 			}
 
 			console.log("Finished running gradient descent after", i, "iterations");
-
-			return weights;
 		};
 
-		function run (w0, w1, points, learningRate, iterationsLimit) {
-			console.log("Starting at w0=",w0, "and w1=", w1);
-			console.log("Learning rate is set at", learningRate);
+		function run (polynomial, points, learningRate, iterationsLimit) {
+			var selection = polynomial.filter(function(item) {
+				return item.selected;
+			});
 
-			console.log("Error at start is", computeError(w0, w1, points));
+			console.log(selection);
 
-			var result = runGradientDescent(w0, w1, points, learningRate, iterationsLimit);
-
-			console.log("Finished with w0=", result[0], "and w1=", result[1]);
-			console.log("Error at end is", computeError(result[0], result[1], points));
-
-			return result;
+			runGradientDescent(selection, points, learningRate, iterationsLimit);
 		};
 	}])
 })();

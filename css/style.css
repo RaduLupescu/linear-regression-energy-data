@@ -1,0 +1,37 @@
+body {
+	background: url("../resources/images/earth_at_night_background.jpg");
+	color: white;
+}
+
+canvas {
+	width: 100%;
+	height: 500px;
+}
+
+rzslider .rz-bubble.rz-limit,
+rzslider .rz-bubble {
+	color: #FFF;
+}
+
+.dataOptions .row,
+.linearRegressionOptions .row {
+	margin-bottom: 20px;
+}
+
+.linearRegressionOptions {
+	border-top: 1px solid white;
+}
+
+ul#polynomialOptions {
+	list-style: none;
+}
+
+ul#polynomialOptions li input {
+	vertical-align: text-bottom;
+}
+
+#header {
+	background-color: #08090E;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}

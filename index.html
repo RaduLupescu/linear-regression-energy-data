@@ -20,93 +20,142 @@
 		<script type="text/javascript" src="scripts/app.js"></script>
 		<script type="text/javascript" src="scripts/utils.service.js"></script>
 		<script type="text/javascript" src="scripts/gradientDescentLinearModel.service.js"></script>
+		<script type="text/javascript" src="scripts/gradientDescentPolynomialModel.service.js"></script>
+		<script type="text/javascript" src="scripts/test.js"></script>
 		<script type="text/javascript" src="scripts/script.js"></script>
 	</head>
 
 	<body ng-app="energyForecast">
-		<div ng-controller="GradientDescentCtrl as gdCtrl"
-			style="margin: auto; width: 1100px; margin-top: 50px">
+		<div ng-controller="GradientDescentCtrl as gdCtrl">
 
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-12">
-						<label>Select energy type</label>
-						<ui-select theme="bootstrap" ng-model="gdCtrl.energyType">
-							<ui-select-match placeholder="Select energy type">{{$select.selected.displayName}}</ui-select-match>
-							<ui-select-choices repeat="item in energyTypes | filter: $select.search" position="down">
-								<div ng-bind-html="item.displayName | highlight: $select.search"></div>
-							</ui-select-choices>
-						</ui-select>
-					</div>
-				</div>
+			<div class="container-fluid" id="header">
+				<h1>Energy Forecasting (Linear Regression)</h1>
 			</div>
 
-			<div class="container">
+			<div class="container-fluid">
 				<div class="row">
-					<div class="col-sm-12">
-						<label>Select country or region</label>
-						<ui-select theme="bootstrap" ng-model="gdCtrl.countrySelection">
-							<ui-select-match placeholder="Select region">{{$select.selected}}</ui-select-match>
-							<ui-select-choices repeat="item in countries | filter: $select.search" position="down">
-								<div ng-bind-html="item | highlight: $select.search"></div>
-							</ui-select-choices>
-						</ui-select>
-					</div>
-				</div>
-			</div>
+					<div class="col-sm-4">
+						<div class="dataOptions">
+							<div class="row">
+								<div class="col-sm-12">
+									<h2>Data options</h2>
+								</div>
+							</div>
 
-			<div class="container" style="margin-top: 20px;">
-				<div class="row">
-					<div class="col-sm-12">
-						<label>Select years range</label>
-						<rzslider rz-slider-model="fromIndex" rz-slider-high="toIndex"
-							rz-slider-options="{floor: 1990, ceil: 2014, minRange: 1}">
-						</rzslider>
-					</div>
-				</div>
+							<div class="row">
+								<div class="col-sm-12">
+									<label>Select energy type</label>
+									<ui-select theme="bootstrap" ng-model="gdCtrl.energyType">
+										<ui-select-match placeholder="Select energy type">{{$select.selected.displayName}}</ui-select-match>
+										<ui-select-choices repeat="item in energyTypes | filter: $select.search" position="down">
+											<div ng-bind-html="item.displayName | highlight: $select.search"></div>
+										</ui-select-choices>
+									</ui-select>
+								</div>
+							</div>
 
-				<div class="row">
-					<div class="col-sm-3">
-						<button class="btn btn-primary" ng-click="showData()" ng-disabled="!gdCtrl.countrySelection">Show data</button>
-					</div>
-				</div>
-			</div>
+							<div class="row">
+								<div class="col-sm-12">
+									<label>Select country or region</label>
+									<ui-select theme="bootstrap" ng-model="gdCtrl.countrySelection">
+										<ui-select-match placeholder="Select region">{{$select.selected}}</ui-select-match>
+										<ui-select-choices repeat="item in countries | filter: $select.search" position="down">
+											<div ng-bind-html="item | highlight: $select.search"></div>
+										</ui-select-choices>
+									</ui-select>
+								</div>
+							</div>
 
-			<div ng-show="haveData">
+							<div class="row">
+								<div class="col-sm-12">
+									<label>Select years range</label>
+									<rzslider rz-slider-model="fromIndex" rz-slider-high="toIndex"
+										rz-slider-options="{floor: 1990, ceil: 2014, minRange: 5}">
+									</rzslider>
+								</div>
+							</div>
 
-				<div class="container">
-					<div class="row">
-						<div class="col-sm-12">
-							<canvas id="line" class="chart chart-line" 
-									chart-data="chartData" chart-labels="chartLabels" 
-									chart-legend="true" chart-series="series"
-									width="1000" height="500">
-							</canvas>
+							<div class="row">
+								<div class="col-sm-6">
+									<button class="btn btn-primary" ng-click="showData()" ng-disabled="!gdCtrl.countrySelection">Get data</button>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
 
-				<div class="container">
-					<div class="row">
-						<div class="col-sm-12">
-							<ul>
-								<li ng-repeat="option in polynomialOptions">
-									<input type="checkbox" id="{{option.name}}" ng-click="option.selected = !option.selected" ng-checked="option.selected">
-									<label for={{option.name}}>
-										{{option.value}}
-										<sup ng-if="option.power">{{option.power}}</sup>
+						<div class="linearRegressionOptions" ng-show="haveData">
+							<div class="row">
+								<div class="col-sm-12">
+									<h2>Linear regression options</h2>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-sm-12">
+									<label for="learningRate">Learning rate</label>
+									<input class="form-control" type="number" id="learningRate" ng-model="learningRate">
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-sm-12">
+									<label for="iterationsLimit">Iterations limit</label>
+									<input class="form-control" type="number" id="iterationsLimit" ng-model="iterationsLimit">
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-sm-12">
+									<input type="radio" id="linearModel" ng-model="regressionType" value="linear">
+									<label for="linearModel">Linear regression with linear model</label>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-sm-12">
+									<input type="radio" id="polynomialModel" ng-model="regressionType" value="polynomial">
+									<label for="polynomialModel">Linear regression with polynomial model</label>
+								</div>
+							</div>
+							<div class="row" ng-show="regressionType === 'polynomial'">
+								<div class="col-sm-12">
+									<label for="polynomialOptions">
+										<span>Construct polynomial model: f(x) = </span>
+										<span ng-bind-html="polynomialSentence"></span>
 									</label>
-								</li>
-							</ul>
-							{{polynomialOptions}}
+									<ul id="polynomialOptions">
+										<li ng-repeat="option in polynomialOptions" ng-show="option.visible">
+											<input type="checkbox" id="{{option.name}}" ng-click="option.selected = !option.selected; constructPolynomialSentence()" ng-checked="option.selected">
+											<label for={{option.name}}>
+												<span>{{option.value}}</span>
+												<sup ng-if="option.power > 1">{{option.power}}</sup>
+											</label>
+										</li>
+									</ul>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-sm-3">
+									<button class="btn btn-primary" ng-click="process()">Process</button>
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div class="container">
-					<div class="row">
-						<div class="col-sm-3">
-							<button class="btn btn-primary" ng-click="process()">Process</button>
+					<div class="col-sm-8" ng-show="haveData">
+						<div class="row">
+							<div class="col-sm-12">
+								<h2>{{gdCtrl.energyType.displayName}} ({{gdCtrl.energyType.unitOfMeasurement}})
+							</div>
+						</div>
+						<span ng-bing-html="polynomialSentence"></span>
+						<div class="row">
+							<div class="col-sm-12">
+								<canvas id="line" class="chart chart-line" 
+										chart-data="chartData" chart-labels="chartLabels" 
+										chart-legend="true" chart-series="series">
+								</canvas>
+							</div>
 						</div>
 					</div>
 				</div>
